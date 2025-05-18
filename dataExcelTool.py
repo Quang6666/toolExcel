@@ -52,6 +52,17 @@ class DataEntryApp:
         # Powered by MinhQuang3tarots (hidden signature)
         self.master._minhquang3tarots = 'Powered by MinhQuang3tarots'
         self.entries = {}
+        # Thêm menu bar
+        self.menu_bar = tk.Menu(master)
+        # File menu
+        file_menu = tk.Menu(self.menu_bar, tearoff=0)
+        file_menu.add_command(label='Đóng', command=self.on_close)
+        self.menu_bar.add_cascade(label='File', menu=file_menu)
+        # Setting menu
+        setting_menu = tk.Menu(self.menu_bar, tearoff=0)
+        setting_menu.add_command(label='Cài đặt vị trí nhập', command=self.open_settings_window)
+        self.menu_bar.add_cascade(label='Setting', menu=setting_menu)
+        master.config(menu=self.menu_bar)
         # Load sheet names
         if os.path.exists(EXCEL_FILE):
             wb = load_workbook(EXCEL_FILE, read_only=True)
@@ -111,9 +122,6 @@ class DataEntryApp:
         self.sheet_combo.bind('<<ComboboxSelected>>', self.update_cty_by_sheet)
         # Load settings
         self.settings = load_settings()
-        # Add settings button
-        self.settings_button = tk.Button(master, text='Cài đặt vị trí nhập', command=self.open_settings_window)
-        self.settings_button.grid(row=len(FIELDS)+2, column=0, columnspan=2, pady=5)
         # Add Excel preview frame
         self.preview_frame = tk.Frame(master)
         self.preview_frame.grid(row=0, column=3, rowspan=len(FIELDS)+3, padx=10, pady=5, sticky='n')
@@ -231,7 +239,14 @@ class DataEntryApp:
                 row_cells = []
                 for idx, c in enumerate(range(preview_start_col, preview_start_col + preview_num_fields)):
                     val = cell_cache.get((r, c))
-                    val_str = str(val) if val is not None else ''
+                    # Luôn hiển thị giá trị dưới dạng chuỗi, không hiển thị .0
+                    if val is None:
+                        val_str = ''
+                    else:
+                        val_str = str(val)
+                        # Nếu là số thực nhưng là số nguyên (10000.0), chuyển thành '10000'
+                        if isinstance(val, float) and val.is_integer():
+                            val_str = str(int(val))
                     pad = col_widths[idx] - len(val_str)
                     left = pad // 2
                     right = pad - left
@@ -257,9 +272,10 @@ class DataEntryApp:
                 elif value == 'Nhập':
                     data.append('N')
                 else:
-                    data.append(value)
+                    data.append(str(value))
             else:
-                data.append(self.entries[field].get())
+                # Luôn lưu dưới dạng chuỗi để tránh bị thành số thực
+                data.append(str(self.entries[field].get()))
         sheet_name = self.sheet_var.get()
         if not sheet_name:
             messagebox.showerror('Lỗi', 'Vui lòng chọn sheet!')
@@ -269,18 +285,14 @@ class DataEntryApp:
             start_row = s.get('start_row', 2)
             start_col = s.get('start_col', 1)
             num_fields = len(FIELDS)
-            # Nếu có cột STT ở cột A (start_col == 2), cần ghi STT tự động
             stt_offset = 1 if start_col == 2 else 0
-            true_start_col = start_col + stt_offset
+            true_start_col = start_col  # Sửa: không cộng offset, luôn bắt đầu từ start_col
             ws = self.excel_mgr.get_sheet(sheet_name)
-            # Tìm dòng ghi dữ liệu tiếp theo
             row = self.excel_mgr.get_last_empty_row(sheet_name, start_row, start_col, num_fields)
-            # Ghi STT nếu có cột STT
             if stt_offset:
-                ws.range((row, 1)).value = row - start_row + 1  # STT bắt đầu từ 1 tại start_row
-            # Ghi dữ liệu các trường còn lại
+                ws.range((row, 1)).value = str(row - start_row + 1)  # STT vào cột A
             for i, value in enumerate(data):
-                ws.range((row, true_start_col + i)).value = value
+                ws.range((row, true_start_col + i)).value = str(value)
             self.excel_mgr.save()
             self.excel_mgr.clear_last_empty_row_cache(sheet_name)
             self.last_entry_info = {
