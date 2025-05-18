@@ -1,0 +1,32 @@
+{
+  "sheets": {
+    "Sheet1": {
+      "start_row": 2,
+      "start_col": 1
+    },
+    "Sheet2": {
+      "start_row": 2,
+      "start_col": 1
+    },
+    "DANH ICH": {
+      "start_row": 5,
+      "start_col": 2
+    },
+    "HAO SAM": {
+      "start_row": 2,
+      "start_col": 1
+    },
+    "I.N.G.DR": {
+      "start_row": 2,
+      "start_col": 1
+    },
+    "FENTAI": {
+      "start_row": 2,
+      "start_col": 1
+    },
+    "WIN WOOD": {
+      "start_row": 2,
+      "start_col": 1
+    }
+  }
+}
