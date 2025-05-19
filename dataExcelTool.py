@@ -9,7 +9,7 @@ import re
 import xlwings as xw
 from excel_manager import ExcelManager
 
-EXCEL_FILE = 'Container đã nhập tháng 5 - Minh Quang.xlsx'
+EXCEL_FILE = 'NHAPCONTAINER.xlsx'
 SETTINGS_FILE = 'settings.json'
 
 FIELDS = [
