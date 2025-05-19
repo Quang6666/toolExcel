@@ -61,6 +61,7 @@ class DataEntryApp:
         # Setting menu
         setting_menu = tk.Menu(self.menu_bar, tearoff=0)
         setting_menu.add_command(label='Cài đặt vị trí nhập', command=self.open_settings_window)
+        setting_menu.add_command(label='Hoàn tác', command=self.undo_last_entry)
         self.menu_bar.add_cascade(label='Setting', menu=setting_menu)
         master.config(menu=self.menu_bar)
         # Load sheet names
@@ -112,11 +113,11 @@ class DataEntryApp:
         today_str = datetime.now().strftime('%d/%m/%Y')
         if 'NGÀY LẤY' in self.entries:
             self.entries['NGÀY LẤY'].insert(0, today_str)
-        self.save_button = tk.Button(master, text='Lưu', command=self.save_data)
-        self.save_button.grid(row=len(FIELDS)+1, column=0, pady=10, sticky='e')
-        # Thêm nút Hoàn tác
-        self.undo_button = tk.Button(master, text='Hoàn tác', command=self.undo_last_entry)
-        self.undo_button.grid(row=len(FIELDS)+1, column=1, pady=10, sticky='w')
+        self.save_button = tk.Button(master, text='Lưu', command=self.save_data, width=20)
+        self.save_button.grid(row=len(FIELDS)+1, column=0, pady=10, sticky='e', columnspan=2)
+        # Bỏ nút Hoàn tác khỏi giao diện chính
+        # self.undo_button = tk.Button(master, text='Hoàn tác', command=self.undo_last_entry)
+        # self.undo_button.grid(row=len(FIELDS)+1, column=1, pady=10, sticky='w')
         self.last_entry_info = None
         # Bind sheet selection to update CTY
         self.sheet_combo.bind('<<ComboboxSelected>>', self.update_cty_by_sheet)
